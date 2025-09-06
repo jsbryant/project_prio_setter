@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Priority Setter</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+},
+},
+};
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+background: #cbd5e1;
+border-radius: 9999px;
+height: 8px;
+}
+.dark input[type="range"]::-webkit-slider-runnable-track {
+background: #4a5568;
+}
+
+input[type="range"]::-moz-range-track {
+background: #cbd5e1;
+border-radius: 9999px;
+height: 8px;
+}
+.dark input[type="range"]::-moz-range-track {
+background: #4a5568;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 20px;
+height: 20px;
+background: #4f46e5;
+border-radius: 50%;
+border: 2px solid white;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+margin-top: -6px;
+}
+
+input[type="range"]::-moz-range-thumb {
+width: 20px;
+height: 20px;
+background: #4f46e5;
+border-radius: 50%;
+border: 2px solid white;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.lock-btn {
+cursor: pointer;
+transition: color 0.2s;
+}
+.lock-btn.locked {
+color: #ef4444; /* Red color for locked state */
+}
+.lock-btn:hover {
+color: #94a3b8; /* Gray color on hover */
+}
+.dark .lock-btn:hover {
+color: #6b7280; /* Darker gray color on hover for dark mode */
+}
+</style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+<!-- Dark Mode Toggle -->
+<button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 shadow-md text-gray-800 dark:text-gray-200 transition-colors duration-300">
+<span id="theme-icon" class="text-xl">🌙</span>
+</button>
+
+<div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 md:p-12 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+<div class="text-center mb-8">
+<h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">Define Your Project Priorities</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm md:text-base">Set your budget and timeline to automatically configure your good, fast, and cheap sliders.</p>
+</div>
+
+<!-- Key Section -->
+<div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl border border-gray-100 dark:border-gray-600 mb-8 space-y-4">
+<h2 class="text-lg font-bold text-gray-700 dark:text-gray-300">Key to Estimates</h2>
+<div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+<p><strong>Budget:</strong></p>
+<ul class="list-disc list-inside space-y-1">
+<li><strong>Small:</strong> Typically for small-scale projects, MVPs, or prototypes. ($5k - $10k)</li>
+<li><strong>Medium:</strong> Suitable for standard web applications or feature sets. ($10k - $50k)</li>
+<li><strong>Large:</strong> For complex, large-scale platforms or enterprise solutions. ($50k+)</li>
+</ul>
+<p class="pt-2"><strong>Timeline:</strong></p>
+<ul class="list-disc list-inside space-y-1">
+<li><strong>Urgent:</strong> A rapid sprint to completion, common for quick proofs of concept.</li>
+<li><strong>Standard:</strong> A typical development cycle with time for iteration and feedback.</li>
+<li><strong>Flexible:</strong> Allows for more thorough R&D and comprehensive feature development.</li>
+</ul>
+</div>
+</div>
+
+<!-- Input Section -->
+<div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl border border-gray-100 dark:border-gray-600 mb-8 space-y-4">
+<div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+<div class="flex-1">
+<label for="budget-input" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Project Budget</label>
+<select id="budget-input" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+<option value="small">Small (Tight Budget)</option>
+<option value="medium">Medium (Average Budget)</option>
+<option value="large">Large (Flexible Budget)</option>
+</select>
+</div>
+<div class="flex-1">
+<label for="timeline-input" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Project Timeline</label>
+<select id="timeline-input" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+<option value="urgent">1 Week (Urgent)</option>
+<option value="standard">1 Month (Standard)</option>
+<option value="flexible">3+ Months (Flexible)</option>
+</select>
+</div>
+</div>
+<div class="flex justify-center pt-4">
+<button id="set-priorities-btn" class="w-full md:w-auto px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+Set Priorities
+</button>
+</div>
+</div>
+
+<!-- Sliders Container -->
+<div class="space-y-8 mb-8">
+<!-- Good Slider -->
+<div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-100 dark:border-gray-600">
+<div class="flex items-center justify-between mb-2">
+<label for="good-slider" class="flex items-center text-lg font-semibold text-gray-700 dark:text-gray-300">
+<!-- <svg class="w-12 h-12 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" alt="Trophy icon to represent quality">
+<path d="M11 16h2v-4h-2m-2 4h2v-4h-2m10-2h-3v-2a2 2 0 00-2-2H9a2 2 0 00-2 2v2H4a2 2 0 00-2 2v2h2v4a2 2 0 002 2h12a2 2 0 002-2v-4h2v-2a2 2 0 00-2-2zm-5-4h-2v4h2v-4z"/>
+</svg> -->
+<div class="image_container" style="position: relative; width: 100px; height: 100px; overflow: hidden; border-radius: 50%; margin-right: 16px;">
+    <img src="https://i.ebayimg.com/images/g/OvQAAOSwBipgSF6l/s-l400.jpg" style="position: absolute; top: -10px; transform: scale(120%);">
+</div>
+Good (Quality)
+</label>
+<span class="flex items-center space-x-2">
+<span id="good-percent" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">33.3%</span>
+<button id="good-lock-btn" class="lock-btn text-gray-400 dark:text-gray-500 text-2xl focus:outline-none" aria-label="Lock Good slider">
+<span id="good-lock-icon">🔓</span>
+</button>
+</span>
+</div>
+<input type="range" id="good-slider" min="0" max="100" step="1" value="33.3" class="w-full h-2 bg-indigo-100 dark:bg-indigo-300 rounded-lg appearance-none cursor-pointer">
+</div>
+
+<!-- Fast Slider -->
+<div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-100 dark:border-gray-600">
+<div class="flex items-center justify-between mb-2">
+<label for="fast-slider" class="flex items-center text-lg font-semibold text-gray-700 dark:text-gray-300">
+<!-- <svg class="w-12 h-12 mr-2 text-indigo-500" fill="currentColor" viewBox="0 0 24 24" alt="Lightning bolt icon to represent speed">
+<path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 14h-2V7h2v9z"/>
+</svg> -->
+<div class="image_container" style="position: relative; width: 100px; height: 100px; overflow: hidden; border-radius: 50%; margin-right: 16px;">
+    <img src="https://hips.hearstapps.com/digitalspyuk.cdnds.net/17/39/1506336946-vin-diesel-fast-and-furious.jpg?crop=0.668xw:1.00xh;0.0697xw,0&resize=640:*" style="position: absolute; top: 6px; left: 10px; transform: scale(120%);">
+</div>
+Fast (Time)
+</label>
+<span class="flex items-center space-x-2">
+<span id="fast-percent" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">33.3%</span>
+<button id="fast-lock-btn" class="lock-btn text-gray-400 dark:text-gray-500 text-2xl focus:outline-none" aria-label="Lock Fast slider">
+<span id="fast-lock-icon">🔓</span>
+</button>
+</span>
+</div>
+<input type="range" id="fast-slider" min="0" max="100" step="1" value="33.3" class="w-full h-2 bg-indigo-100 dark:bg-indigo-300 rounded-lg appearance-none cursor-pointer">
+</div>
+
+<!-- Cheap Slider -->
+<div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-100 dark:border-gray-600">
+<div class="flex items-center justify-between mb-2">
+<label for="cheap-slider" class="flex items-center text-lg font-semibold text-gray-700 dark:text-gray-300">
+<!-- <svg class="w-12 h-12 mr-2 text-green-500" fill="currentColor" viewBox="0 0 24 24" alt="Dollar sign icon to represent cost">
+<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.6 15H11.5c-2.21 0-4-1.79-4-4s1.79-4 4-4h2.1c.55 0 1 .45 1 1v.5c0 .55-.45 1-1 1h-2.1c-.55 0-1 .45-1 1s.45 1 1 1h2.1c.55 0 1 .45 1 1v.5c0 .55-.45 1-1 1zm-1.6-9h-2c-1.1 0-2 .9-2 2s.9 2 2 2h2v-4z"/>
+</svg> -->
+<div class="image_container" style="position: relative; width: 100px; height: 100px; overflow: hidden; border-radius: 50%; margin-right: 16px;">
+    <img src="https://akns-images.eonline.com/eol_images/Entire_Site/201757/rs_634x1024-170607184646-634-barney-dinosaur.jpg?fit=around%7C634:1024&output-quality=90&crop=634:1024;center,top" style="position: absolute; top: 20px; left: -10px; transform: scale(120%);">
+</div>
+Cheap (Cost)
+</label>
+<span class="flex items-center space-x-2">
+<span id="cheap-percent" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">33.3%</span>
+<button id="cheap-lock-btn" class="lock-btn text-gray-400 dark:text-gray-500 text-2xl focus:outline-none" aria-label="Lock Cheap slider">
+<span id="cheap-lock-icon">🔓</span>
+</button>
+</span>
+</div>
+<input type="range" id="cheap-slider" min="0" max="100" step="1" value="33.3" class="w-full h-2 bg-indigo-100 dark:bg-indigo-300 rounded-lg appearance-none cursor-pointer">
+</div>
+</div>
+
+<!-- Estimated Output Section -->
+<div class="bg-purple-100 dark:bg-purple-900 p-6 rounded-2xl text-center mb-8 border border-purple-200 dark:border-purple-800">
+<h3 class="text-xl md:text-2xl font-bold text-purple-800 dark:text-purple-200 mb-2">Estimated Project Output</h3>
+<p id="estimated-timeline" class="text-purple-700 dark:text-purple-300 font-semibold text-lg mb-1"></p>
+<p id="estimated-budget" class="text-purple-700 dark:text-purple-300 font-semibold text-lg"></p>
+</div>
+
+<!-- Summary Section -->
+<div class="bg-indigo-50 dark:bg-indigo-900 p-6 rounded-2xl text-center">
+<h3 class="text-xl md:text-2xl font-bold text-indigo-800 dark:text-indigo-200 mb-2">Project Strategy</h3>
+<p id="summary-text" class="text-indigo-700 dark:text-indigo-300 font-medium leading-relaxed"></p>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const budgetInput = document.getElementById('budget-input');
+const timelineInput = document.getElementById('timeline-input');
+const setPrioritiesBtn = document.getElementById('set-priorities-btn');
+
+const goodSlider = document.getElementById('good-slider');
+const fastSlider = document.getElementById('fast-slider');
+const cheapSlider = document.getElementById('cheap-slider');
+
+const goodPercent = document.getElementById('good-percent');
+const fastPercent = document.getElementById('fast-percent');
+const cheapPercent = document.getElementById('cheap-percent');
+
+const goodLockBtn = document.getElementById('good-lock-btn');
+const fastLockBtn = document.getElementById('fast-lock-btn');
+const cheapLockBtn = document.getElementById('cheap-lock-btn');
+
+const goodLockIcon = document.getElementById('good-lock-icon');
+const fastLockIcon = document.getElementById('fast-lock-icon');
+const cheapLockIcon = document.getElementById('cheap-lock-icon');
+
+const summaryText = document.getElementById('summary-text');
+const estimatedTimeline = document.getElementById('estimated-timeline');
+const estimatedBudget = document.getElementById('estimated-budget');
+
+const sliders = [goodSlider, fastSlider, cheapSlider];
+const lockBtns = [goodLockBtn, fastLockBtn, cheapLockBtn];
+const lockIcons = [goodLockIcon, fastLockIcon, cheapLockIcon];
+
+let lockedSlider = null;
+
+// These are the baseline values for a typical tech project
+let baseBudget = 5000; 
+let baseTimeline = 1;
+
+// Dark Mode Logic
+const themeToggleBtn = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const html = document.documentElement;
+
+const setTheme = (theme) => {
+if (theme === 'dark') {
+html.classList.add('dark');
+localStorage.setItem('theme', 'dark');
+themeIcon.textContent = '☀️';
+} else {
+html.classList.remove('dark');
+localStorage.setItem('theme', 'light');
+themeIcon.textContent = '🌙';
+}
+};
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+setTheme(savedTheme);
+} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+setTheme('dark');
+} else {
+setTheme('light');
+}
+
+themeToggleBtn.addEventListener('click', () => {
+const currentTheme = localStorage.getItem('theme');
+setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+
+function updatePercentages(changedSlider) {
+if (lockedSlider && changedSlider.id === lockedSlider.id) {
+return;
+}
+
+let unlockedSliders = sliders.filter(slider => slider !== lockedSlider);
+let unlockedTotal = 100;
+
+if (lockedSlider) {
+unlockedTotal = 100 - parseFloat(lockedSlider.value);
+}
+
+let otherUnlockedSliders = unlockedSliders.filter(slider => slider !== changedSlider);
+
+const changedValue = parseFloat(changedSlider.value);
+const remaining = unlockedTotal - changedValue;
+
+if (remaining < 0) {
+changedSlider.value = unlockedTotal;
+otherUnlockedSliders.forEach(slider => slider.value = 0);
+} else {
+const newOtherValue = remaining / otherUnlockedSliders.length;
+otherUnlockedSliders.forEach(slider => {
+slider.value = newOtherValue;
+});
+}
+updateSummary();
+}
+
+function updateSummary() {
+const goodVal = parseFloat(goodSlider.value);
+const fastVal = parseFloat(fastSlider.value);
+const cheapVal = parseFloat(cheapSlider.value);
+
+goodPercent.textContent = `${goodVal.toFixed(1)}%`;
+fastPercent.textContent = `${fastVal.toFixed(1)}%`;
+cheapPercent.textContent = `${cheapVal.toFixed(1)}%`;
+
+const sorted = [
+{ name: 'Quality', value: goodVal },
+{ name: 'Time', value: fastVal },
+{ name: 'Cost', value: cheapVal }
+].sort((a, b) => b.value - a.value);
+
+const primary = sorted[0];
+const secondary = sorted[1];
+const tertiary = sorted[2];
+
+let message = '';
+let emoji = '';
+
+// Determine the emoji based on the order
+const primaryName = primary.name;
+const secondaryName = secondary.name;
+const tertiaryName = tertiary.name;
+
+if (primaryName === 'Quality' && secondaryName === 'Cost' && tertiaryName === 'Time') {
+emoji = '🍻';
+} else if (primaryName === 'Quality' && secondaryName === 'Time' && tertiaryName === 'Cost') {
+emoji = '🍸';
+} else if (primaryName === 'Cost' && secondaryName === 'Time' && tertiaryName === 'Quality') {
+emoji = '🌭';
+} else if (primaryName === 'Cost' && secondaryName === 'Quality' && tertiaryName === 'Time') {
+emoji = '🌮';
+} else if (primaryName === 'Time' && secondaryName === 'Quality' && tertiaryName === 'Cost') {
+emoji = '🍙';
+} else if (primaryName === 'Time' && secondaryName === 'Cost' && tertiaryName === 'Quality') {
+emoji = '🍟';
+}
+
+if (primary.value > 80) {
+message = `You are heavily prioritizing **${primary.name}**. This means the project will likely be much weaker in terms of ${secondary.name} and ${tertiary.name}.`;
+} else if (primary.value > 50) {
+message = `Your primary focus is on **${primary.name}**. You are also prioritizing **${secondary.name}** at the expense of ${tertiary.name}.`;
+} else if (goodVal === fastVal && fastVal === cheapVal) {
+message = 'You are attempting to balance all three categories. Remember, this can be difficult and may require careful trade-offs throughout the project.';
+} else {
+message = `You are balancing your priorities, with a slight emphasis on **${primary.name}** and **${secondary.name}**.`;
+}
+
+if (emoji) {
+message = `${emoji} ${message}`;
+}
+summaryText.innerHTML = message;
+
+updateEstimates();
+}
+
+function updateEstimates() {
+const fastVal = parseFloat(fastSlider.value);
+const cheapVal = parseFloat(cheapSlider.value);
+
+const timelineMultiplier = 2.5 - (fastVal / 100) * 2;
+const budgetMultiplier = 2.5 - (cheapVal / 100) * 2;
+
+const newTimeline = baseTimeline * timelineMultiplier;
+const newBudget = baseBudget * budgetMultiplier;
+
+let timelineMessage = '';
+if (newTimeline < 1) {
+timelineMessage = `Estimated Timeline: **Less than one week**`;
+} else if (newTimeline < 4.33) {
+timelineMessage = `Estimated Timeline: **${newTimeline.toFixed(1)} weeks**`;
+} else {
+const months = newTimeline / 4.33;
+timelineMessage = `Estimated Timeline: **${months.toFixed(1)} months**`;
+}
+
+estimatedTimeline.innerHTML = timelineMessage;
+estimatedBudget.innerHTML = `Estimated Budget: **$${Math.round(newBudget).toLocaleString()}**`;
+}
+
+function setPriorities() {
+const budget = budgetInput.value;
+const timeline = timelineInput.value;
+
+let cheapValue;
+if (budget === 'small') {
+cheapValue = 60;
+} else if (budget === 'medium') {
+cheapValue = 40;
+} else {
+cheapValue = 20;
+}
+
+let fastValue;
+if (timeline === 'urgent') {
+fastValue = 60;
+} else if (timeline === 'standard') {
+fastValue = 40;
+} else {
+fastValue = 20;
+}
+
+const goodValue = 100 - (cheapValue + fastValue);
+
+goodSlider.value = goodValue;
+fastSlider.value = fastValue;
+cheapSlider.value = cheapValue;
+
+// Clear any locks when setting new priorities
+lockedSlider = null;
+updateLockState();
+
+updateSummary();
+}
+
+function updateLockState() {
+sliders.forEach(slider => {
+slider.disabled = false; // Enable all sliders first
+});
+
+lockBtns.forEach(btn => {
+btn.classList.remove('locked');
+});
+
+lockIcons.forEach(icon => {
+icon.textContent = '🔓';
+});
+
+if (lockedSlider) {
+lockedSlider.disabled = true; // Disable the locked slider
+const lockBtn = document.getElementById(lockedSlider.id.replace('-slider', '-lock-btn'));
+const lockIcon = document.getElementById(lockedSlider.id.replace('-slider', '-lock-icon'));
+lockBtn.classList.add('locked');
+lockIcon.textContent = '🔒';
+}
+}
+
+function toggleLock(slider, btn) {
+if (lockedSlider === slider) {
+lockedSlider = null; // Unlock it
+} else {
+lockedSlider = slider; // Lock the clicked slider
+}
+updateLockState();
+if (lockedSlider) {
+let otherSliders = sliders.filter(s => s !== lockedSlider);
+updatePercentages(otherSliders[0]);
+}
+}
+
+setPrioritiesBtn.addEventListener('click', setPriorities);
+
+sliders.forEach(slider => {
+slider.addEventListener('input', (event) => updatePercentages(event.target));
+});
+
+goodLockBtn.addEventListener('click', () => toggleLock(goodSlider, goodLockBtn));
+fastLockBtn.addEventListener('click', () => toggleLock(fastSlider, fastLockBtn));
+cheapLockBtn.addEventListener('click', () => toggleLock(cheapSlider, cheapLockBtn));
+
+setPriorities();
+});
+</script>
+
+</body>
+</html>
